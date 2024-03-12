@@ -67,7 +67,7 @@ class LLM_Mistral:
             llm_chain = LLMChain(prompt=prompt, llm=self.llm)
             return llm_chain
     
-
+s
     def _ask_a_question(self, question:str):
         """
         Ask a question to the LLM model.
