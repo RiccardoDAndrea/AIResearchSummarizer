@@ -142,7 +142,7 @@ class OpenAI_RAG:
             openai_api_key= self.open_ai_token,
             model_name = "gpt-3.5-turbo",
             temperature = 0.0,
-            max_tokens = 150
+            max_tokens = 300
         )
 
         return llm
