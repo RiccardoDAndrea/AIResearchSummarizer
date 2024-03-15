@@ -90,9 +90,7 @@ class getPapers:
 get_papers = getPapers()
 
 author, title, abstract = get_papers.initialize('https://www.jmlr.org')
-print(author, title)
-print('++++++++++++++++')
-print(abstract)
+
 
 
 
