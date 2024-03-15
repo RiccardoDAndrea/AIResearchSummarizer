@@ -95,6 +95,7 @@ class OpenAI_RAG:
 
     def initialise_chroma(self, chunks, embedding_function):
         """
+        
         Initialisiert die Chroma Datenbank
         Input:
             - chunks: Die Chunks der Exteren Datenquelle
