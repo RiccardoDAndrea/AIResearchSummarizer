@@ -33,150 +33,158 @@ with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 
 # Extrahiere die Variable aus den Daten
 
 
-# class OpenAI_RAG:
-#     """
-#     Eine Klasse die ein OpenAI-Modell initialisiert und eine Frage beantwortet.
-#     Input: 
-#         - Ist die Frage als Varaible query
+class OpenAI_RAG:
+    """
+    Eine Klasse die ein OpenAI-Modell initialisiert und eine Frage beantwortet.
+    Input: 
+        - Ist die Frage als Varaible query
 
-#     Output:
-#         - Die Antwort auf die Frage
+    Output:
+        - Die Antwort auf die Frage
     
-#     """
+    """
 
-#     def __init__(self, open_ai_token: str):
-#         self.open_ai_token = open_ai_token
+    def __init__(self, open_ai_token: str):
+        self.open_ai_token = open_ai_token
 
-#     def text_splitter(self):
-#         """
-#         Initialisiert den Text-Splitter
+    def text_splitter(self):
+        """
+        Initialisiert den Text-Splitter
 
-#         Input:
-#             - None
+        Input:
+            - None
 
-#         Output:
-#             - text_splitter: Ein Objekt des Text-Splitters
-#         """
+        Output:
+            - text_splitter: Ein Objekt des Text-Splitters
+        """
         
-#         text_splitter = RecursiveCharacterTextSplitter(
-#             chunk_size=200,
-#             chunk_overlap=50, 
-#             length_function=len
-#         )
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=200,
+            chunk_overlap=50, 
+            length_function=len
+        )
 
-#         return text_splitter
+        return text_splitter
 
-#     def loader_for_chunks(self, text_splitter, filepath: str):
-#         """
-#         Initialisiert den Loader für die Chunks mit der Exteren Datenquelle
+    def loader_for_chunks(self, text_splitter, filepath: str):
+        """
+        Initialisiert den Loader für die Chunks mit der externen Datenquelle
 
-#         Input:
-#             - text_splitter: Ein Objekt des Text-Splitters aus der function text_splitter()
+        Input:
+            - text_splitter: Ein Objekt des Text-Splitters aus der function text_splitter()
+            - filepath: Der Pfad zur externen Datenquelle (z.B. eine PDF-Datei)
 
-#         Output:
-#             - chunks: Die Chunks der Exteren Datenquelle
-#         """
+        Output:
+            - chunks: Die Chunks der externen Datenquelle
+        """
+        # Annahme: Die Methode initialize() gibt Autor, Titel und Abstract zurück
+        author, title, abstract = getPapers().initialize('https://www.jmlr.org')
 
-#         loader = PyPDFLoader(filepath)
-#         chunks = loader.load_and_split(text_splitter=text_splitter)
+        # Hier kannst du die Rückgabewerte von initialize() verwenden
+        print("Autor:", author)
+        print("Titel:", title)
+        print("Abstract:", abstract)
 
-#         return chunks
+        # Beispielhafte Verwendung des Abstracts
+        abstract_chunks = text_splitter.split_text(abstract)
 
-#     def embedding(self):
-#         """
-#         Gibt ein Model mit Sentence-Embeddings zurück
-#         Input: 
-#             - None
+        return abstract_chunks
 
-#         Output: 
-#             - embedding_function
-#         """
+    def embedding(self):
+        """
+        Gibt ein Model mit Sentence-Embeddings zurück
+        Input: 
+            - None
 
-#         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+        Output: 
+            - embedding_function
+        """
 
-#         return embedding_function
+        embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-#     def initialise_chroma(self, chunks, embedding_function):
-#         """
+        return embedding_function
+
+    def initialise_chroma(self, chunks, embedding_function):
+        """
         
-#         Initialisiert die Chroma Datenbank
-#         Input:
-#             - chunks: Die Chunks der Exteren Datenquelle
-#             - embedding_function: Ein Objekt des Sentence-Embeddings
+        Initialisiert die Chroma Datenbank
+        Input:
+            - chunks: Die Chunks der Exteren Datenquelle
+            - embedding_function: Ein Objekt des Sentence-Embeddings
 
-#         Output:
-#             - db: Die Chroma Datenbank
-#         """
+        Output:
+            - db: Die Chroma Datenbank
+        """
 
-#         db = Chroma.from_documents(chunks, embedding_function)
+        db = Chroma.from_documents(chunks, embedding_function)
 
-#         return db
+        return db
     
-#     def retriever(self, db, query):
-#         """
-#         Initialisiert den Retriever für die externe Datenquellen und gibt die relevanten Dokumente zurück aus der Quelle
-#         filepath = '/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/merged.pdf'
+    def retriever(self, db, query):
+        """
+        Initialisiert den Retriever für die externe Datenquellen und gibt die relevanten Dokumente zurück aus der Quelle
+        filepath = '/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/merged.pdf'
 
-#         Input:
-#             - db: Die Chroma Datenbank
-#             - query: Die Frage
+        Input:
+            - db: Die Chroma Datenbank
+            - query: Die Frage
         
-#         Output:
-#             - retriever: Die relevanten Dokumente
+        Output:
+            - retriever: Die relevanten Dokumente
         
-#         """
+        """
 
-#         retriever = db.as_retriever()
-#         retriever.get_relevant_documents(query)
+        retriever = db.as_retriever()
+        retriever.get_relevant_documents(query)
         
-#         return retriever
+        return retriever
 
-#     def llm_model(self):
-#         """
-#         Initialisiert das OpenAI-Modell. Hier wird das OpenAI modell genutzt für das RAG Modell
+    def llm_model(self):
+        """
+        Initialisiert das OpenAI-Modell. Hier wird das OpenAI modell genutzt für das RAG Modell
         
-#         Input:
-#             - None
+        Input:
+            - None
         
-#         Output:
-#             - das LLM Modell von OpenAI
-#         """
+        Output:
+            - das LLM Modell von OpenAI
+        """
         
-#         llm = ChatOpenAI(
-#             openai_api_key= self.open_ai_token,
-#             model_name = "gpt-3.5-turbo",
-#             temperature = 0.0,
-#             max_tokens = 300
-#         )
+        llm = ChatOpenAI(
+            openai_api_key= self.open_ai_token,
+            model_name = "gpt-3.5-turbo",
+            temperature = 0.0,
+            max_tokens = 300
+        )
 
-#         return llm
+        return llm
         
-#     def qa_with_sources(self, query):
-#         """
-#         Die Funktion die die Frage beantwortet und die Quellen zurückgibt
-#         Input:
-#             - query: Die die Frage beinhalet
-#         Output:
-#             - qa_with_sources: Die Antwort auf die Frage und die Quellen
+    def qa_with_sources(self, query):
+        """
+        Die Funktion die die Frage beantwortet und die Quellen zurückgibt
+        Input:
+            - query: Die die Frage beinhalet
+        Output:
+            - qa_with_sources: Die Antwort auf die Frage und die Quellen
         
-#         """
+        """
 
-#         llm = self.llm_model()
-#         text_splitter_instance = self.text_splitter()
-#         chunks = self.loader_for_chunks(text_splitter_instance, filepath)
-#         embedding_instance = self.embedding()
-#         retriever_instance = self.retriever(Chroma.from_documents(chunks, embedding_instance), query)
-#         qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
+        llm = self.llm_model()
+        text_splitter_instance = self.text_splitter()
+        chunks = self.loader_for_chunks(text_splitter_instance, filepath)
+        embedding_instance = self.embedding()
+        retriever_instance = self.retriever(Chroma.from_documents(chunks, embedding_instance), query)
+        qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
         
-#         return qa_with_sources(query)
+        return qa_with_sources(query)
 
-# # Erstelle eine Instanz der Klasse OpenAI_RAG
-# openai_rag = OpenAI_RAG(open_ai_token)
+# Erstelle eine Instanz der Klasse OpenAI_RAG
+openai_rag = OpenAI_RAG(open_ai_token)
 
-# # Stelle eine Frage und erhalte die Antwort
-# filepath = '/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/doc_1.pdf'
-# query = "Can you summarize the Abstract in the paper 'Attention Is All You Need?'"
-# antwort = openai_rag.qa_with_sources(query)
+# Stelle eine Frage und erhalte die Antwort
+filepath = '/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/doc_1.pdf'
+query = f"Can you summarize the Abstract in the paper '{title}' by {author}"
+antwort = openai_rag.qa_with_sources(query)
 
-# # Gib die Antwort aus
-# print("Antwort:", antwort)
+# Gib die Antwort aus
+print("Antwort:", antwort)
