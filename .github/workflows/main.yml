@@ -27,7 +27,7 @@ jobs:
           
         run: python Scripts/github_actions/OpenAI.py
       
-      - name: Run Second Script
+      - name: Run llm Mistral_2
         env:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
