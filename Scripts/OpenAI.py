@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
 import os
-
+OPENAI_Token = os.environ.get('OPENAI_TOKEN')
 
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -53,8 +53,8 @@ class OpenAI_RAG:
     
     """
 
-    def __init__(self, open_ai_token: str):
-        self.open_ai_token = open_ai_token
+    def __init__(self, OPENAI_Token: str):
+        self.open_ai_token = OPENAI_Token
 
     def text_splitter(self):
         """
@@ -202,7 +202,7 @@ class OpenAI_RAG:
         return qa_with_sources.invoke(query)
 
 # Erstelle eine Instanz der Klasse OpenAI_RAG
-openai_rag = OpenAI_RAG(open_ai_token)
+openai_rag = OpenAI_RAG(OPENAI_Token)
 
 # Stelle eine Frage und erhalte die Antwort
 query = "Can you give me the authors, title and summaries the abstract also with bullet points?"
