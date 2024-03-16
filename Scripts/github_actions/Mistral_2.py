@@ -212,3 +212,52 @@ antwort = openai_rag.qa_with_sources(query)
 
 # Gib die Antwort aus
 print("Antwort:", antwort, formatted_date_time)
+
+
+
+### sending message
+body = f"""
+Good day Herr DAndrea,
+here you have your newest updated in the AI World
+{antwort}
+
+
+"""
+
+
+
+# C R E A T E _ M A I L 
+
+
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import ssl
+
+# Define email parameters
+port = 465
+smtp_server = "smtp.gmail.com"
+USER_EMAIL = os.environ.get('USER_EMAIL')
+USER_PASSWORD = os.environ.get('USER_PASSWORD')
+
+subject = "GitHub Email Report"
+
+# Create email message
+message = MIMEMultipart()
+message['From'] = USER_EMAIL
+message['To'] = USER_EMAIL
+message['Subject'] = subject
+
+# Attach the body to the email
+message.attach(MIMEText(body, "plain"))
+
+# Establish a secure connection with the SMTP server
+context = ssl.create_default_context()
+with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+    # Log in to the email server
+    server.login(USER_EMAIL, USER_PASSWORD)
+    # Send email
+    server.sendmail(USER_EMAIL, USER_EMAIL, message.as_string())
+
+print("E-Mail wurde erfolgreich gesendet.")
