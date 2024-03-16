@@ -207,11 +207,10 @@ print("Antwort:", antwort)
 
 ### sending message
 body = f"""
-Good day Herr DAndrea,
+**Good day Herr DAndrea,**
 here you have your newest updated in the AI World
+
 {antwort}
-
-
 """
 
 # C R E A T E _ M A I L 
