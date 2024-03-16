@@ -5,16 +5,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.chains import RetrievalQAWithSourcesChain
+from class_get_papers import getPapers
 import requests
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
 import os
-
-
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-# Verwende die Klasse
 
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
@@ -31,12 +26,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Diese Strategie ermöglicht die nahtlose Integration von automatisierter Datenerfassung und -verarbeitung mit einem leistungsstarken OpenAI Language Model, um präzise Antworten auf Fragen bereitzustellen.
 
 
-# Öffne die JSON-Datei und lade den Inhalt
-# with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
-#     api_token_file = json.load(api_file)
-#     open_ai_token = api_token_file['Open_api_token']
 
-# Extrahiere die Variable aus den Daten
 
 
 class OpenAI_RAG:
@@ -50,8 +40,8 @@ class OpenAI_RAG:
     
     """
 
-    def __init__(self, open_ai_token: str):
-        self.open_ai_token = open_ai_token
+    def __init__(self, OPENAI_TOKEN: str):
+        self.OPENAI_TOKEN = OPENAI_TOKEN
 
     def text_splitter(self):
         """
@@ -171,7 +161,7 @@ class OpenAI_RAG:
         """
         
         llm = ChatOpenAI(
-            openai_api_key= self.open_ai_token,
+            openai_api_key= OPENAI_TOKEN,
             model_name = "gpt-3.5-turbo",
             temperature = 0.0,
             max_tokens = 300
@@ -198,8 +188,10 @@ class OpenAI_RAG:
         
         return qa_with_sources.invoke(query)
 
+
+OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 # Erstelle eine Instanz der Klasse OpenAI_RAG
-openai_rag = OpenAI_RAG(open_ai_token)
+openai_rag = OpenAI_RAG(OPENAI_TOKEN)
 
 # Stelle eine Frage und erhalte die Antwort
 query = "Can you give me the authors, title and summaries the abstract also with bullet points?"
