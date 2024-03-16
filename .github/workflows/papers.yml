@@ -14,9 +14,10 @@ jobs:
         with:
           python-version: 3.11.5
 
-      # Neuer Schritt, um Abhängigkeiten zu installieren
+      # Installiere erforderliche Abhängigkeiten
       - name: Install dependencies
         run: |
+          pip install langchain_openai langchain langchain_community class_get_papers requests beautifulsoup4
 
       - name: Run email code
         env:
