@@ -1,23 +1,25 @@
 
 from langchain_openai import ChatOpenAI
 import json
+from langchain_community.llms import HuggingFaceEndpoint
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.chains import RetrievalQAWithSourcesChain
-from class_get_papers import getPapers
 import requests
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
 import os
+from datetime import datetime
 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
     api_token_file = json.load(api_file)
 
-# OpenAI API Token
-Open_api_token = api_token_file['Open_api_token']
+# Extrahiere die Variable aus den Daten
+api_token = api_token_file['Hugging_face_token']
+# Verwende die Klasse
 
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
 
@@ -33,10 +35,12 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Diese Strategie ermöglicht die nahtlose Integration von automatisierter Datenerfassung und -verarbeitung mit einem leistungsstarken OpenAI Language Model, um präzise Antworten auf Fragen bereitzustellen.
 
 
+# Öffne die JSON-Datei und lade den Inhalt
+
+# Extrahiere die Variable aus den Daten
 
 
-
-class OpenAI_RAG:
+class Mistral7B_RAG:
     """
     Eine Klasse die ein OpenAI-Modell initialisiert und eine Frage beantwortet.
     Input: 
@@ -47,8 +51,8 @@ class OpenAI_RAG:
     
     """
 
-    def __init__(self, Open_api_token: str):
-        self.Open_api_token = Open_api_token
+    def __init__(self, api_token: str):
+        self.api_token = api_token
 
     def text_splitter(self):
         """
@@ -167,13 +171,9 @@ class OpenAI_RAG:
             - das LLM Modell von OpenAI
         """
         
-        llm = ChatOpenAI(
-            openai_api_key= Open_api_token,
-            model_name = "gpt-3.5-turbo",
-            temperature = 0.0,
-            max_tokens = 300
-        )
-
+        llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
+                              huggingfacehub_api_token= self.api_token,
+                              )
         return llm
         
     def qa_with_sources(self, query):
@@ -195,15 +195,20 @@ class OpenAI_RAG:
         
         return qa_with_sources.invoke(query)
 
-
-OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 # Erstelle eine Instanz der Klasse OpenAI_RAG
-openai_rag = OpenAI_RAG(Open_api_token)
+openai_rag = Mistral7B_RAG(api_token)
 
+
+# datetime object containing current date and time
+now = datetime.now()
+
+# Formatieren des Datums und der Uhrzeit
+# Ändere das Format entsprechend deinen Anforderungen
+formatted_date_time = now.strftime("%Y-%m-%d_%H_%M_%S")
 # Stelle eine Frage und erhalte die Antwort
-query = "Can you give me the authors, title and summaries the abstract also with bullet points?"
+query = "Can you give me the authors, title and summaries the abstract?"
 
 antwort = openai_rag.qa_with_sources(query)
 
 # Gib die Antwort aus
-print("Antwort:", antwort)
+print("Antwort:", antwort, formatted_date_time)
