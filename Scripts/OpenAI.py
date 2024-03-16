@@ -32,9 +32,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 # Öffne die JSON-Datei und lade den Inhalt
-with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
-    api_token_file = json.load(api_file)
-    open_ai_token = api_token_file['Open_api_token']
+# with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
+#     api_token_file = json.load(api_file)
+#     open_ai_token = api_token_file['Open_api_token']
 
 # Extrahiere die Variable aus den Daten
 
