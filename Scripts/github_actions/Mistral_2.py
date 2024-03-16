@@ -13,12 +13,7 @@ import os
 from datetime import datetime
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
-    api_token_file = json.load(api_file)
-
-# Extrahiere die Variable aus den Daten
-api_token = api_token_file['Hugging_face_token']
-# Verwende die Klasse
+HUGGINGFACEAPI_TOKEN = os.environ.get('HUGGINGFACEAPI_TOKEN')
 
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
@@ -51,8 +46,8 @@ class Mistral7B_RAG:
     
     """
 
-    def __init__(self, api_token: str):
-        self.api_token = api_token
+    def __init__(self, HUGGINGFACEAPI_TOKEN: str):
+        self.HUGGINGFACEAPI_TOKEN = HUGGINGFACEAPI_TOKEN
 
     def text_splitter(self):
         """
@@ -172,7 +167,7 @@ class Mistral7B_RAG:
         """
         
         llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
-                              huggingfacehub_api_token= self.api_token,
+                              huggingfacehub_api_token= HUGGINGFACEAPI_TOKEN,
                               )
         return llm
         
@@ -196,7 +191,7 @@ class Mistral7B_RAG:
         return qa_with_sources.invoke(query)
 
 # Erstelle eine Instanz der Klasse OpenAI_RAG
-openai_rag = Mistral7B_RAG(api_token)
+openai_rag = Mistral7B_RAG(HUGGINGFACEAPI_TOKEN)
 
 
 # datetime object containing current date and time
