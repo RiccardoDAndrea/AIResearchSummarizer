@@ -6,10 +6,18 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.chains import RetrievalQAWithSourcesChain
 from class_get_papers import getPapers
+import requests
+from bs4 import BeautifulSoup
+from langchain_community.document_loaders import WebBaseLoader
+import os
+
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Verwende die Klasse
 get_papers_instance = getPapers()
 author, title, abstract = get_papers_instance.initialize('https://www.jmlr.org')
+
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
 
@@ -61,12 +69,13 @@ class OpenAI_RAG:
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=200,
             chunk_overlap=50, 
-            length_function=len
+            length_function=len,
+            
         )
 
         return text_splitter
 
-    def loader_for_chunks(self, text_splitter, filepath: str):
+    def loader_for_chunks(self, text_splitter):
         """
         Initialisiert den Loader für die Chunks mit der externen Datenquelle
 
@@ -78,17 +87,30 @@ class OpenAI_RAG:
             - chunks: Die Chunks der externen Datenquelle
         """
         # Annahme: Die Methode initialize() gibt Autor, Titel und Abstract zurück
-        author, title, abstract = getPapers().initialize('https://www.jmlr.org')
+        response = requests.get("https://www.jmlr.org")                                    # Abrufen der Webseite
+        if response.status_code == 200:                                 # status code 200 bedeutet, dass die Anfrage erfolgreich war
+            text = response.text                                        # Inhalt der Webseite html code
+            soup = BeautifulSoup(text, 'html.parser')                   # Erstelle ein BeautifulSoup-Objekt form html code
+            paper_links = soup.find_all('a', href=True)                 # Finde alle Links auf der Webseite 
+            meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')] # Finde alle Links die auf .html enden für die Abstract-Seite
+            
+            ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0] # Wähle den Link der auf /papers/ endet
+            webpage_abs = "https://www.jmlr.org"+ ergebnis
 
-        # Hier kannst du die Rückgabewerte von initialize() verwenden
-        print("Autor:", author)
-        print("Titel:", title)
-        print("Abstract:", abstract)
+        if response.status_code == 200:                                     # bei erfolgreich abrufen der Webseite
+            text = response.text                                            # Inhalt der Webseite html code
+            soup = BeautifulSoup(text, 'html.parser')                       # Erstelle ein BeautifulSoup-Objekt form html code
+            paper_links = soup.find_all('a', href=True)                     # Finde alle Links auf der Webseite
+            meta_data_ = [link['href'] for link in paper_links if link['href'].endswith('.bib')] # Finde alle Links die auf .bib enden für die Metadaten
+            meta_data = meta_data_[0]                                       # Wähle den akutellsten Link
+            ergebnis_meta_info = "https://www.jmlr.org" + meta_data   
 
-        # Beispielhafte Verwendung des Abstracts
-        abstract_chunks = text_splitter.split_text(abstract)
 
-        return abstract_chunks
+
+        loader = WebBaseLoader([webpage_abs , ergebnis_meta_info]) # Erstelle ein WebBaseLoader-Objekt
+        chunks = loader.load_and_split()
+
+        return chunks
 
     def embedding(self):
         """
@@ -134,7 +156,7 @@ class OpenAI_RAG:
         
         """
 
-        retriever = db.as_retriever()
+        retriever = db.as_retriever(search_kwargs={"k": 2})
         retriever.get_relevant_documents(query)
         
         return retriever
@@ -171,19 +193,19 @@ class OpenAI_RAG:
 
         llm = self.llm_model()
         text_splitter_instance = self.text_splitter()
-        chunks = self.loader_for_chunks(text_splitter_instance, filepath)
+        chunks = self.loader_for_chunks(text_splitter_instance)
         embedding_instance = self.embedding()
         retriever_instance = self.retriever(Chroma.from_documents(chunks, embedding_instance), query)
         qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
         
-        return qa_with_sources(query)
+        return qa_with_sources.invoke(query)
 
 # Erstelle eine Instanz der Klasse OpenAI_RAG
 openai_rag = OpenAI_RAG(open_ai_token)
 
 # Stelle eine Frage und erhalte die Antwort
-filepath = '/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/doc_1.pdf'
-query = f"Can you summarize the Abstract in the paper '{title}' by {author}"
+query = "Can you give me the authors, title and summaries the abstract also with bullet points?"
+
 antwort = openai_rag.qa_with_sources(query)
 
 # Gib die Antwort aus
