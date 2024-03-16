@@ -15,8 +15,6 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Verwende die Klasse
-get_papers_instance = getPapers()
-author, title, abstract = get_papers_instance.initialize('https://www.jmlr.org')
 
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
