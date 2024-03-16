@@ -21,6 +21,6 @@ jobs:
 
       - name: Run email code
         env:
-          USER_EMAIL: ${{ secrets.OPENAI_TOKEN }}
+          OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           
         run: python Scripts/github_actions/OpenAI.py
