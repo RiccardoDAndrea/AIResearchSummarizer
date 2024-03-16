@@ -223,16 +223,15 @@ import ssl
 # Define email parameters
 port = 465
 smtp_server = "smtp.gmail.com"
-USERNAME = os.environ.get('USER_EMAIL')
-PASSWORD = os.environ.get('USER_PASSWORD')
-sender_email = USERNAME
-receiver_email = USERNAME
+USER_EMAIL = os.environ.get('USER_EMAIL')
+USER_PASSWORD = os.environ.get('USER_PASSWORD')
+
 subject = "GitHub Email Report"
 
 # Create email message
 message = MIMEMultipart()
-message['From'] = sender_email
-message['To'] = receiver_email
+message['From'] = USER_EMAIL
+message['To'] = USER_EMAIL
 message['Subject'] = subject
 
 # Attach the body to the email
@@ -242,8 +241,8 @@ message.attach(MIMEText(body, "plain"))
 context = ssl.create_default_context()
 with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
     # Log in to the email server
-    server.login(USERNAME, PASSWORD)
+    server.login(USER_EMAIL, USER_PASSWORD)
     # Send email
-    server.sendmail(sender_email, receiver_email, message.as_string())
+    server.sendmail(USER_EMAIL, USER_EMAIL, message.as_string())
 
 print("E-Mail wurde erfolgreich gesendet.")
