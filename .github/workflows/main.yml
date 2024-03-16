@@ -17,7 +17,7 @@ jobs:
       # Installiere erforderliche Abhängigkeiten
       - name: Install dependencies
         run: |
-          pip install langchain_openai langchain langchain_community requests beautifulsoup4
+          pip install langchain_openai langchain langchain_community requests beautifulsoup4 sentence-transformers
 
       - name: Run llm OpenAI
         env:
