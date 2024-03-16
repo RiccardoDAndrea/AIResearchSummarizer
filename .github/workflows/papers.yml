@@ -1,4 +1,4 @@
-name: daily-report
+name: Paper_summaries
 
 on:
   schedule:
