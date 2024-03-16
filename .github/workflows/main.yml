@@ -31,5 +31,5 @@ jobs:
         env:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
-          SECOND_SCRIPT_SECRET: ${{ secrets.HUGGINGFACE_API_TOKEN }}
+          HUGGINGFACE_API_TOKEN: ${{ secrets.HUGGINGFACE_API_TOKEN }}
         run: python Scripts/github_actions/Mistral_2.py

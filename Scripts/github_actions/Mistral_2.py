@@ -164,7 +164,7 @@ class Mistral7B_RAG:
         """
         
         llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
-                              huggingfacehub_api_token= HUGGINGFACEAPI_TOKEN,
+                              huggingfacehub_api_token= self.HUGGINGFACEAPI_TOKEN,
                               )
         return llm
         
@@ -192,18 +192,16 @@ openai_rag = Mistral7B_RAG(HUGGINGFACEAPI_TOKEN)
 
 
 # datetime object containing current date and time
-now = datetime.now()
 
 # Formatieren des Datums und der Uhrzeit
 # Ändere das Format entsprechend deinen Anforderungen
-formatted_date_time = now.strftime("%Y-%m-%d_%H_%M_%S")
 # Stelle eine Frage und erhalte die Antwort
 query = "Can you give me the authors, title and summaries the abstract?"
 
 antwort = openai_rag.qa_with_sources(query)
 
 # Gib die Antwort aus
-print("Antwort:", antwort, formatted_date_time)
+print("Antwort:", antwort)
 
 
 
