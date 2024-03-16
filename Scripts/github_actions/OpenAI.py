@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
 import os
 
-
+OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
 
@@ -187,7 +187,7 @@ class OpenAI_RAG:
         return qa_with_sources.invoke(query)
 
 
-OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
+
 # Erstelle eine Instanz der Klasse OpenAI_RAG
 openai_rag = OpenAI_RAG(OPENAI_TOKEN)
 
