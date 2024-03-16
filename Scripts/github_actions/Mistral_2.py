@@ -1,6 +1,3 @@
-
-from langchain_openai import ChatOpenAI
-import json
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
@@ -13,7 +10,7 @@ import os
 from datetime import datetime
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-HUGGINGFACEAPI_TOKEN = os.environ.get('HUGGINGFACEAPI_TOKEN')
+HUGGINGFACEAPI_TOKEN = os.environ.get('HUGGINGFACE_API_TOKEN')
 
 # Strategie:
 # Entwicklung eines OpenAI LLM RAG Modell:
@@ -219,12 +216,7 @@ here you have your newest updated in the AI World
 
 """
 
-
-
 # C R E A T E _ M A I L 
-
-
-
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
