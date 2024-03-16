@@ -19,7 +19,7 @@ jobs:
         run: |
           pip install langchain_openai langchain langchain_community requests beautifulsoup4
 
-      - name: Run email code
+      - name: Run llm OpenAI
         env:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           
