@@ -12,6 +12,7 @@ from langchain_community.document_loaders import WebBaseLoader
 import os
 
 
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Verwende die Klasse

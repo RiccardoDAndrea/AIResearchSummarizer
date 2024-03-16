@@ -20,6 +20,6 @@ jobs:
 
       - name: Run email code
         env:
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
-        run: python Scripts/Mistral_2.py
+          USER_EMAIL: ${{ secrets.OPENAI_TOKEN }}
+          
+        run: python Scripts/OpenAI.py
