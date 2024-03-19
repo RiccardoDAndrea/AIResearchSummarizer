@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
 import os
 from datetime import datetime
-
+#ä
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
     api_token_file = json.load(api_file)
