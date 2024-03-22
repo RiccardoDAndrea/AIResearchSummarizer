@@ -107,8 +107,6 @@ class Mistral7B_RAG:
             meta_data = meta_data_[0]                                       # Wähle den akutellsten Link
             ergebnis_meta_info = "https://www.jmlr.org" + meta_data   
 
-
-
         loader = WebBaseLoader([webpage_abs , ergebnis_meta_info]) # Erstelle ein WebBaseLoader-Objekt
         chunks = loader.load_and_split()
 

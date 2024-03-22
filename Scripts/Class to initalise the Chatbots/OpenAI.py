@@ -33,9 +33,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Diese Strategie ermöglicht die nahtlose Integration von automatisierter Datenerfassung und -verarbeitung mit einem leistungsstarken OpenAI Language Model, um präzise Antworten auf Fragen bereitzustellen.
 
 
-
-
-
 class OpenAI_RAG:
     """
     Eine Klasse die ein OpenAI-Modell initialisiert und eine Frage beantwortet.
@@ -99,9 +96,7 @@ class OpenAI_RAG:
             meta_data_ = [link['href'] for link in paper_links if link['href'].endswith('.bib')] # Finde alle Links die auf .bib enden für die Metadaten
             meta_data = meta_data_[0]                                       # Wähle den akutellsten Link
             ergebnis_meta_info = "https://www.jmlr.org" + meta_data   
-
-
-
+            
         loader = WebBaseLoader([webpage_abs , ergebnis_meta_info]) # Erstelle ein WebBaseLoader-Objekt
         chunks = loader.load_and_split()
 

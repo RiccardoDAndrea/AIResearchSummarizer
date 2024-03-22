@@ -24,9 +24,6 @@ OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 # Diese Strategie ermöglicht die nahtlose Integration von automatisierter Datenerfassung und -verarbeitung mit einem leistungsstarken OpenAI Language Model, um präzise Antworten auf Fragen bereitzustellen.
 
 
-
-
-
 class OpenAI_RAG:
     """
     Eine Klasse die ein OpenAI-Modell initialisiert und eine Frage beantwortet.
@@ -205,15 +202,9 @@ body = f"""
 Good day Herr DAndrea,
 here you have your newest updated in the AI World
 {antwort}
-
-
 """
 
-
-
 # C R E A T E _ M A I L 
-
-
 
 import smtplib
 from email.mime.multipart import MIMEMultipart

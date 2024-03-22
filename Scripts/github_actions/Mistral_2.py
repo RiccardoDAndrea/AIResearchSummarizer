@@ -97,7 +97,6 @@ class Mistral7B_RAG:
             ergebnis_meta_info = "https://www.jmlr.org" + meta_data   
 
 
-
         loader = WebBaseLoader([webpage_abs , ergebnis_meta_info]) # Erstelle ein WebBaseLoader-Objekt
         chunks = loader.load_and_split()
 
@@ -191,10 +190,6 @@ class Mistral7B_RAG:
 openai_rag = Mistral7B_RAG(HUGGINGFACEAPI_TOKEN)
 
 
-# datetime object containing current date and time
-
-# Formatieren des Datums und der Uhrzeit
-# Ändere das Format entsprechend deinen Anforderungen
 # Stelle eine Frage und erhalte die Antwort
 query = "Can you give me the authors, title and summaries the abstract?"
 
@@ -202,8 +197,6 @@ antwort = openai_rag.qa_with_sources(query)
 
 # Gib die Antwort aus
 print("Antwort:", antwort)
-
-
 
 ### sending message
 body = f"""
