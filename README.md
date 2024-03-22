@@ -23,4 +23,4 @@ Once the data is collected, a chatbot is initialized. This involves using Mistra
 ## Functionality
 
 The chatbots are then instructed to return the authors, title, and key findings from the abstract.
-
+So we get every day at 12 o'clock a Email with the instruction.
