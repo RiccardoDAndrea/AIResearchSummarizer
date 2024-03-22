@@ -1,10 +1,16 @@
-# Project Description
+# RAG-Powered Research Assistant
+
+![LangChain_RAG](https://deci.ai/wp-content/uploads/2023/08/deci-langchain-rag-featured-1024x576.png)
+
+
 
 This project creates a chatbot using [Mistral](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)  and [ChatGPT](https://python.langchain.com/docs/integrations/text_embedding/openai).
 
 ## Main Task
 
-The main task is to start a virtual VM through Github Actions. This is executed by a cron job every day at 12 o'clock.
+The main task is to start a virtual VM through  
+[Github Action](https://docs.github.com/de/actions).
+Actions. This is executed by a cron job every day at 12 o'clock.
 
 ## Data Collection
 
