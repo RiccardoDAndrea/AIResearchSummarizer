@@ -16,22 +16,15 @@ with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 
 api_token = api_token_file['Hugging_face_token']
 
 
-
-
-
-
 class LLM_Mistral:
-
-
     """
     Eine Klasse, um mit einem Sprachmodell zu interagieren.
     """
+
     def __init__(self, api_token:str, question:str):
         self.api_token = api_token
         self.llm = self._set_llm_model()
         self.question = question
-
-        
 
 
     def _set_llm_model(self):
@@ -81,10 +74,6 @@ class LLM_Mistral:
 
 
 # Example usage:
-
-
-
-
 response = {
     'question': 'What makes Osnabrück in germany so great?', 
     'text': 'Osnabrück, a city located in northwest Germany, is known for several unique features that make it a great place to live, work, and visit. Here are some reasons why Osnabrück is considered special:\n\n1. Rich History: Osnabrück has a rich and diverse history. The city was founded in 1224 and has been an important trading center and cultural hub for centuries. It was also the site of the Peace'
@@ -94,9 +83,5 @@ question = response['question']
 llm_instance = LLM_Mistral(api_token, question)
 
 response = llm_instance._ask_a_question(question)
-
-
-
-
 
 print(response['text'])
