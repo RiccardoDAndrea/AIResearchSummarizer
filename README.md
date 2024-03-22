@@ -4,7 +4,7 @@
 
 
 
-This project creates a chatbot using [Mistral](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)  and [ChatGPT](https://python.langchain.com/docs/integrations/text_embedding/openai).
+This project creates a chatbot using [Mistral](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)  and [ChatGPT](https://python.langchain.com/docs/integrations/text_embedding/openai) **achieved through the Langchain API 🦜.**
 
 ## Main Task
 
