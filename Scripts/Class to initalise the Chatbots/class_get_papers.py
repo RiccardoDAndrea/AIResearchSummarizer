@@ -92,6 +92,7 @@ get_papers = getPapers()
 author, title, abstract = get_papers.initialize('https://www.jmlr.org')
 
 
+print(f"Author: {author}\nTitle: {title}\nAbstract: {abstract}")
 
 
 
