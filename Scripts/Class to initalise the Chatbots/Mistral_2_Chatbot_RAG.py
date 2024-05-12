@@ -1,4 +1,3 @@
-
 from langchain_openai import ChatOpenAI
 import json
 from langchain_community.llms import HuggingFaceEndpoint
@@ -13,6 +12,7 @@ from langchain_community.document_loaders import WebBaseLoader
 import os
 from datetime import datetime
 
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
     api_token_file = json.load(api_file)
@@ -22,26 +22,6 @@ api_token = api_token_file['Hugging_face_token']
 # Verwende die Klasse
 get_papers_instance = getPapers()
 author, title, abstract = get_papers_instance.initialize('https://www.jmlr.org')
-
-# Strategie:
-# Entwicklung eines OpenAI LLM RAG Modell:
-
-# Erstellen einer Klasse (class) für ein OpenAI Language Model (LLM), das in der Lage ist, Fragen zu beantworten aus exterenen Datenquellen.
-# Automatisierte Datenextraktion und -verarbeitung:
-
-# Implementierung eines automatisierten Systems zur Extraktion und Verarbeitung von Daten aus PDF-Dokumenten.
-# Die Daten werden im Verzeichnis /Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/docs_for_llm_pipline gesammelt.
-# Die extrahierten Daten werden zu einem großen PDF-Dokument zusammengeführt.
-# Ausführung eines GitHub-Action-Skripts:
-
-# Einrichten eines GitHub-Action-Skripts, das die PDFs automatisch zusammenführt und verarbeitet.
-# Diese Strategie ermöglicht die nahtlose Integration von automatisierter Datenerfassung und -verarbeitung mit einem leistungsstarken OpenAI Language Model, um präzise Antworten auf Fragen bereitzustellen.
-
-
-# Öffne die JSON-Datei und lade den Inhalt
-
-# Extrahiere die Variable aus den Daten
-
 
 class Mistral7B_RAG:
     """

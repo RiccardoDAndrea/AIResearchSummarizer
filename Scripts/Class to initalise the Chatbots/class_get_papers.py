@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import bibtexparser
 
+### Der folgende Skirpt wird verwendet, um die Metadaten und das Abstract der 
+### neuesten Veröffentlichung von JMLR abzurufen.
+### Als variable erhaöten wir den Autor, den Titel und das Abstract der neuesten Veröffentlichung
+
 class getPapers:
     """
     Eine Klasse für unseren LLM der mit einer RAG Modell ausgesatet wird.
