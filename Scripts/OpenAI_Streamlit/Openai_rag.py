@@ -197,27 +197,46 @@ class OpenAI_RAG:
 
 
 # Hole den OpenAI-Token aus den Umgebungsvariablen
-# Hole den OpenAI-Token aus den Umgebungsvariablen
 OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 
 # Erstelle eine Instanz der OpenAI_RAG-Klasse
+
 openai_rag = OpenAI_RAG(OPENAI_TOKEN, uploaded_file)
 
-if "messages" not in st.session_state.keys(): # Initialize the chat message history
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Ask me a question about Streamlit's open-source Python library!"}
-    ]
 
 ## Chatbot
+# Initialize the "messages" list in session state if it doesn't exist
+try:
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-if prompt:= st.chat_input("Stelle eine Frage:"):
-    st.divider()
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    st.chat_message("user").write(prompt)
-    antwort = openai_rag.qa_with_sources(prompt)
-    with st.chat_message("assistant"):
-        st.write(antwort["answer"])
+    if prompt := st.chat_input("Stelle eine Frage:"):
+        st.divider()
+        # Append the user message to the history
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
-else:
-    st.divider()
-    antwort = st.write("Warte auf eine Frage...")
+        st.chat_message("user").write(prompt)
+        try:
+            antwort = openai_rag.qa_with_sources(prompt)
+            with st.chat_message("assistant"):
+                st.write(antwort["answer"])
+                # Optionally, append the assistant's response to the history
+                st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
+        except ValueError as e:  # Handle the specific error
+            if "Expected IDs to be a non-empty list" in str(e):
+                st.error("Es scheint ein Problem mit den Dokumenten zu geben. Überprüfe bitte, ob Dokumente hochgeladen wurden.")
+            else:
+                st.error(f"Es ist ein Fehler aufgetreten. Bitte versuche es erneut. {e}")
+
+    else:
+        st.divider()
+        antwort = st.write("Warte auf eine Frage...")
+
+except Exception as e:
+    st.write(e)
+    st.write("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.")
