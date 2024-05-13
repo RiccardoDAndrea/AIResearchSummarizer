@@ -219,24 +219,22 @@ try:
 
     if prompt := st.chat_input("Stelle eine Frage:"):
         st.divider()
-        
+        st.session_state.uploaded_file = 'uplaoded_file'
+        if 'uploaded_file' in st.session_state:
+            st.session_state.uploaded_file = []
         # Append the user message to the history
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
         try:
             
             antwort = openai_rag.qa_with_sources(prompt)
-            # Dokument wurde hochgeladen, leere den Session-State
-            st.session_state.messages = []
-
-                # Verarbeitung der Anfrage mit dem neuen Dokument
             with st.chat_message("assistant"):
-                st.write(antwort["answer"])
-                st.write(antwort)
+                st.write(antwort["sources"])
+                #st.write(antwort)
                 st.write(uploaded_file)
-
                 # Optionally, append the assistant's response to the history
                 st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
+                st.write(st.session_state)
         except ValueError as e:  # Handle the specific error
             if "Expected IDs to be a non-empty list" in str(e):
                 st.error("Es scheint ein Problem mit den Dokumenten zu geben. Überprüfe bitte, ob Dokumente hochgeladen wurden.")
