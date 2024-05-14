@@ -203,8 +203,7 @@ class OpenAI_RAG:
 
 
 # Hole den OpenAI-Token aus den Umgebungsvariablen
-# Hole den OpenAI-Token aus den Umgebungsvariablen
-# Hole den OpenAI-Token aus den Umgebungsvariablen
+
 OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 
 # Erstelle eine Instanz der OpenAI_RAG-Klasse
