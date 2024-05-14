@@ -15,6 +15,7 @@ import os
 import json
 from langchain_community.document_loaders import PyPDFLoader
 from tempfile import NamedTemporaryFile
+from streamlit_chromadb_connection.chromadb_connection import ChromadbConnection
 
 # with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 'r') as api_file:
 #     api_token_file = json.load(api_file)
@@ -122,7 +123,16 @@ class OpenAI_RAG:
             - db: Die Chroma Datenbank
         """
 
-        db = Chroma.from_documents(chunks, embedding_function)
+        configuration = {
+            "client": "PersistentClient",
+            "path": "/tmp/.chroma"
+        }
+        collection_name = "documents_collection"
+        conn = st.connection("chromadb",
+                            type=ChromaDBConnection,
+                            **configuration)
+        documents_collection_df = conn.get_collection_data(collection_name)
+        db = st.dataframe(documents_collection_df)
 
         return db
     
