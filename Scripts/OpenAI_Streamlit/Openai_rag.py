@@ -40,7 +40,11 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 sidebar = st.sidebar.title("OpenAI RAG")
-uploaded_file = st.sidebar.file_uploader("Upload PDF", type=["pdf"])
+
+expander = st.expander("Upload here your Docs", expanded=True)
+
+with expander:
+    uploaded_file = st.file_uploader("Upload PDF", type=["pdf"])
 
 
 class OpenAI_RAG:
@@ -199,15 +203,13 @@ class OpenAI_RAG:
 
 
 # Hole den OpenAI-Token aus den Umgebungsvariablen
+# Hole den OpenAI-Token aus den Umgebungsvariablen
+# Hole den OpenAI-Token aus den Umgebungsvariablen
 OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 
 # Erstelle eine Instanz der OpenAI_RAG-Klasse
-
 openai_rag = OpenAI_RAG(OPENAI_TOKEN, uploaded_file)
 
-
-## Chatbot
-# Initialize the "messages" list in session state if it doesn't exist
 try:
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -219,22 +221,16 @@ try:
 
     if prompt := st.chat_input("Stelle eine Frage:"):
         st.divider()
-        st.session_state.uploaded_file = 'uplaoded_file'
-        if 'uploaded_file' in st.session_state:
-            st.session_state.uploaded_file = []
         # Append the user message to the history
         st.session_state.messages.append({"role": "user", "content": prompt})
+
         st.chat_message("user").write(prompt)
         try:
-            
             antwort = openai_rag.qa_with_sources(prompt)
             with st.chat_message("assistant"):
-                st.write(antwort["sources"])
-                #st.write(antwort)
-                st.write(uploaded_file)
+                st.write(antwort["answer"])
                 # Optionally, append the assistant's response to the history
                 st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
-                st.write(st.session_state)
         except ValueError as e:  # Handle the specific error
             if "Expected IDs to be a non-empty list" in str(e):
                 st.error("Es scheint ein Problem mit den Dokumenten zu geben. Überprüfe bitte, ob Dokumente hochgeladen wurden.")
