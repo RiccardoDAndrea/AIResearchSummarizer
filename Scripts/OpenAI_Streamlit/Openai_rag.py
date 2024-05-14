@@ -194,7 +194,7 @@ st.write ("""This is a simple implementation of OpenAI's
           summarization, and translation.""")
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-sidebar = st.sidebar.title("OpenAI RAG")
+
 
 # Hole den OpenAI-Token aus den Umgebungsvariablen
 OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
@@ -218,17 +218,17 @@ if uploaded_file:
         # Append the user message to the history
             
             st.session_state.messages.append({"role": "user", "content": prompt})
-
             st.chat_message("user").write(prompt)
             
+            with st.spinner("Thinking..."):  # Display spinner while processing
+                antwort = openai_rag.qa_with_sources(prompt)
             
-            antwort = openai_rag.qa_with_sources(prompt)
             with st.chat_message("assistant"):
                 st.write(antwort["answer"])
                 # append the assistant's response to the history
                 st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
-
-
+        
+            
     else:
         st.divider()
         with st.chat_message("assistant"):
@@ -242,7 +242,6 @@ if uploaded_file:
                         Don't forget to upload a PDF! 📎
                         """)
 else:   
-    
     with st.chat_message("assistant"):
             st.markdown("""
                         Welcome to Prime! 🤖 I am your personal document detective! Send me your PDFs and I will put them through their paces. From 
