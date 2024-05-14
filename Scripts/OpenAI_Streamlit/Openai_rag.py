@@ -180,7 +180,9 @@ class OpenAI_RAG:
         qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
         
         return qa_with_sources.invoke(query)
+    
 # Streamlit Main
+
 st.title("OpenAI RAG")
 st.write ("""This is a simple implementation of OpenAI's 
           Retrieval Augmented Generation (RAG) model. 
@@ -198,10 +200,11 @@ sidebar = st.sidebar.title("OpenAI RAG")
 OPENAI_TOKEN = os.environ.get('OPENAI_TOKEN')
 
 uploaded_file = st.file_uploader("Choose a PDF file", type=["pdf"])
+
 openai_rag = OpenAI_RAG(OPENAI_TOKEN, uploaded_file)
 
 # Chat
-try:
+if uploaded_file:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -218,18 +221,13 @@ try:
 
             st.chat_message("user").write(prompt)
             
-            try:
-                antwort = openai_rag.qa_with_sources(prompt)
-                with st.chat_message("assistant"):
-                    st.write(antwort["answer"])
-                    # append the assistant's response to the history
-                    st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
             
-            except ValueError as e:  # Handle the specific error
-                if "Expected IDs to be a non-empty list" in str(e):
-                    st.error("Es scheint ein Problem mit den Dokumenten zu geben. Überprüfe bitte, ob Dokumente hochgeladen wurden.")
-                else:
-                    st.error(f"Es ist ein Fehler aufgetreten. Bitte versuche es erneut. {e}")
+            antwort = openai_rag.qa_with_sources(prompt)
+            with st.chat_message("assistant"):
+                st.write(antwort["answer"])
+                # append the assistant's response to the history
+                st.session_state.messages.append({"role": "assistant", "content": antwort["answer"]})
+
 
     else:
         st.divider()
@@ -243,8 +241,15 @@ try:
                         I'm your man! 🕵️‍♂️ Uh, your bot. Never mind, you know. Let us crack your PDFs! 💼
                         Don't forget to upload a PDF! 📎
                         """)
+else:   
+    
+    with st.chat_message("assistant"):
+            st.markdown("""
+                        Welcome to Prime! 🤖 I am your personal document detective! Send me your PDFs and I will put them through their paces. From 
+                        - "What's this about?" to 
+                        - "What are the key points?" and even 
+                        - "What's the scoop on topic X?" - 
 
-
-except Exception as e:
-    st.write(e)
-    st.write("Es ist ein Fehler aufgetreten. Bitte versuche es erneut.")
+                        I'm your man! 🕵️‍♂️ Uh, your bot. Never mind, you know. Let us crack your PDFs! 💼
+                        Don't forget to upload a PDF! 📎
+                        """)
