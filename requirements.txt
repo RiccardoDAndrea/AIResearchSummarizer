@@ -1,4 +1,3 @@
-aiohttp @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b1m9c8aqie/croot/aiohttp_1707342290832/work
 aioredis==1.3.1
 aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
 altair @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_a8x4081_4h/croot/altair_1687526044471/work
@@ -319,3 +318,4 @@ xattr==1.1.0
 yarl @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a8s46tbbn5/croot/yarl_1701105147904/work
 zipp @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_31jm3q76eq/croot/zipp_1704206913245/work
 zope.interface==6.3
+ '/private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b1m9c8aqie/croot/aiohttp_1707342290832/work'
