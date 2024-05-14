@@ -20,12 +20,15 @@ with open('/Users/riccardo/Desktop/Repositorys_Github/LLM/Docs/api_token.json', 
     api_token_file = json.load(api_file)
 
 
-
+openai_token = st.sidebar.text_input("OpenAI API Token", "sk-")
+if len(openai_token) == 0:
+    st.warning("Please enter your OpenAI API Token")
+    st.stop()
 
 
 # OpenAI API Token
-Open_api_token = api_token_file['Open_api_token']
-
+#Open_api_token = api_token_file['Open_api_token']
+Open_api_token = openai_token
 
 class OpenAI_RAG:
     """
@@ -182,6 +185,7 @@ class OpenAI_RAG:
         return qa_with_sources.invoke(query)
     
 # Streamlit Main
+st.sidebar.title("OpenAI RAG")
 
 st.title("OpenAI RAG")
 st.write ("""This is a simple implementation of OpenAI's 
