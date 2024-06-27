@@ -19,13 +19,13 @@ jobs:
         run: |
           pip install langchain_openai langchain langchain_community requests beautifulsoup4 sentence-transformers chromadb
 
-      - name: Run llm OpenAI
-        env:
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
-          OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
-          
-        run: python Scripts/github_actions/OpenAI.py
+#      - name: Run llm OpenAI
+#        env:
+#          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+#          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+#          OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
+#          
+#        run: python Scripts/github_actions/OpenAI.py
       
       - name: Run llm Mistral_2
         env:
