@@ -1,1 +1,1 @@
-latest_paper_link
+PDF_docs
