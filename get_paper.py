@@ -10,15 +10,20 @@ def getPaper(url: str):
         - latest_paper_link: string
     """
     response = requests.get(url)  # Abrufen der Webseite
+    
     if response.status_code == 200:  # Statuscode 200 bedeutet, dass die Anfrage erfolgreich war
         text = response.text
         soup = BeautifulSoup(text, 'html.parser')  # Erstelle ein BeautifulSoup-Objekt form html code
         paper_links = soup.find_all('a', href=True)  # Finde alle Links auf der Webseite
         meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.pdf')]  # Finde alle Links die auf .pdf enden
+        
         if meta_data_:
             latest_paper = meta_data_[0]
             latest_paper_link = 'https://www.jmlr.org' + latest_paper
-            return latest_paper_link
+            str_latest_paper_link = ''.join(latest_paper_link)
+            #print(str_latest_paper_link)
+            return str_latest_paper_link
+
     return None
 
 def update_pdf_links(url: str, pdf_links: set):
@@ -36,12 +41,9 @@ def update_pdf_links(url: str, pdf_links: set):
     return pdf_links
 
 # Initialisiere ein Set für die PDF-Links
-pdf_paper_links_set = set()
+str_latest_paper_link = set()
 
 # Update die PDF-Links-Liste
-pdf_paper_links_set = update_pdf_links('https://www.jmlr.org/', pdf_paper_links_set)
-
-# Konvertiere das Set in eine Liste, wenn nötig
-pdf_paper_links_list = list(pdf_paper_links_set)
-
-print(pdf_paper_links_list)
+pdf_paper_links_set = update_pdf_links('https://www.jmlr.org/', str_latest_paper_link)
+str_pdf_paper_links_set = ''.join(pdf_paper_links_set)
+print(str_pdf_paper_links_set)
