@@ -45,7 +45,8 @@ class Paper_to_Chatbot:
                     latest_paper_link = pdf_links[0]
                     latest_paper_url = url + latest_paper_link
                     name_of_file = latest_paper_link.split('/')[-1]
-                    return latest_paper_url, name_of_file          
+                    return latest_paper_url, name_of_file    
+                      
                 else:
                     print("No PDF links found.")
                     return None, None
