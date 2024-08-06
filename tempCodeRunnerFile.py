@@ -1,1 +1,1 @@
-embedding_function
+ #db = Chroma.from_documents(chunks, embedding_function)

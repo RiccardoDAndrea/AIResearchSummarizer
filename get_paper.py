@@ -120,9 +120,11 @@ class Paper_to_Chatbot:
             - text_splitter: An object of the text splitter
         """
         text_splitter = RecursiveCharacterTextSplitter(
+            separators="\n",
             chunk_size=200,
             chunk_overlap=50,
             length_function=len)
+        
         return text_splitter
 
     def chunks(self):
@@ -138,8 +140,20 @@ class Paper_to_Chatbot:
         abstract_text = self.getAbstract()
         if abstract_text:
             text_splitter = self.text_splitter()
-            chunks = text_splitter.split_text(abstract_text)
-            print(chunks)
+            chunks_abstract = text_splitter.split_text(abstract_text)
+            
+
+            chunks_pdf_doc = []
+            # Check if the "PDF_docs" directory exists and has files
+            if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
+                directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
+                if directory_path.endswith('.pdf'):
+                    text_splitter = self.text_splitter()
+                    loader = PyPDFLoader(directory_path)
+                    chunks_pdf_doc += loader.load_and_split()
+            
+            chunks = chunks_abstract + chunks_pdf_doc
+            
             # # Check if the "PDF_docs" directory exists and has files
             # if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
             #     directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
@@ -187,7 +201,7 @@ class Paper_to_Chatbot:
             embedding_function = self.embedding()
         
             #db = Chroma.from_documents(chunks, embedding_function)
-            db = Chroma.from_texts(chunks, embedding_function)
+            db = Chroma.from_documents(chunks, embedding_function)
 
             return db
         else:
@@ -225,29 +239,11 @@ class Paper_to_Chatbot:
         """
         
         llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
-                              huggingfacehub_api_token = API_Key,
-                              )
+                              huggingfacehub_api_token = API_Key)
         return llm
     
-    def qa_with_sources(self, query):
-        """
-        Die Funktion die die Frage beantwortet und die Quellen zurückgibt
-        Input:
-            - query: Die die Frage beinhalet
-        Output:
-            - qa_with_sources: Die Antwort auf die Frage und die Quellen
+    
         
-        """
-
-        llm = self.llm_model()
-        text_splitter_instance = self.text_splitter()
-        chunks = self.loader_for_chunks(text_splitter_instance)
-        embedding_instance = self.embedding()
-        retriever_instance = self.retriever(Chroma.from_documents(chunks, embedding_instance), query)
-        qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
-        
-        return qa_with_sources.invoke(query)
-
 
 
 import json
@@ -269,7 +265,7 @@ print(API_Key)
 
 
 
-
+print(Paper_to_Chatbot.chunks(Paper_to_Chatbot("https://www.jmlr.org/")))
 
 
 
