@@ -8,8 +8,13 @@ import requests
 import fitz # PyMuPDF
 import os
 
+
 class Paper_to_Chatbot:
     
+    def __init__(self, url: str):
+        self.url = url
+
+
     def check_and_create_folder(self):
         """
         Check if the folder exists and if not create it.
@@ -23,7 +28,8 @@ class Paper_to_Chatbot:
             print("Folder created")
             return False
 
-    def getPaper(self, url: str):
+
+    def getPaper(self):
         """
         A function that retrieves the latest paper from the website https://www.jmlr.org/ of the most recent publication.
         Input:
@@ -33,7 +39,7 @@ class Paper_to_Chatbot:
             - name_of_file: string (example 23-1612.pdf)
         """
         if self.check_and_create_folder():
-            response = requests.get(url)  # Fetch the webpage
+            response = requests.get(self.url)  # Fetch the webpage
             
             if response.status_code == 200:  # Status code 200 means the request was successful
                 soup = BeautifulSoup(response.text, 'html.parser')  # Create a BeautifulSoup object from the HTML code
@@ -42,8 +48,8 @@ class Paper_to_Chatbot:
                 pdf_links = [link['href'] for link in paper_links if link['href'].endswith('.pdf')]  # Find all links ending with .pdf
                 
                 if pdf_links:
-                    latest_paper_link = pdf_links[0]
-                    latest_paper_url = url + latest_paper_link
+                    latest_paper_link = pdf_links[0]  # get the first item of the list
+                    latest_paper_url = self.url + latest_paper_link
                     name_of_file = latest_paper_link.split('/')[-1]
                     return latest_paper_url, name_of_file    
                       
@@ -55,17 +61,18 @@ class Paper_to_Chatbot:
                 print(f"Error: {response.status_code}")
                 return None, None
         
-    def download_pdf(self, url: str, filename: str):
+
+    def download_pdf(self, pdf_url: str, filename: str):
         """
         Downloads a PDF file from a URL and saves it locally.
         
         Input:
-        - url: The URL of the PDF file
+        - pdf_url: The URL of the PDF file
         - filename: The local filename to save the PDF as
         """
-        try:    
+        try:
             full_path = os.path.join('PDF_docs', filename)
-            response = requests.get(url)
+            response = requests.get(pdf_url)
             if response.status_code == 200:
                 with open(full_path, 'wb') as file:
                     file.write(response.content)
@@ -77,12 +84,16 @@ class Paper_to_Chatbot:
         except Exception as e:
             print(f"An error occurred: {e}")
 
+
+
+
+
 # Example usage:
-bot = Paper_to_Chatbot()
-url = 'https://www.jmlr.org/'  # Replace with the actual URL of the JMLR website
-paper_url, filename = bot.getPaper(url)
-if paper_url and filename:
-    bot.download_pdf(paper_url, filename)
+url = "https://www.jmlr.org/"
+paper_bot = Paper_to_Chatbot(url)
+pdf_url, filename = paper_bot.getPaper()
+if pdf_url and filename:
+    paper_bot.download_pdf(pdf_url, filename)
 
 
 
