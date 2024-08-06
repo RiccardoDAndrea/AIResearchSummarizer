@@ -139,20 +139,23 @@ class Paper_to_Chatbot:
         if abstract_text:
             text_splitter = self.text_splitter()
             chunks = text_splitter.split_text(abstract_text)
-            
-            # Check if the "PDF_docs" directory exists and has files
-            if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
-                directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
-                if directory_path.endswith('.pdf'):
-                    loader = PyPDFLoader(directory_path)
-                    chunks += loader.load_and_split()
-                    print(chunks)
-                else:
-                    print("No PDF files found in the directory.")
-            else:
-                print("PDF_docs directory is empty or does not exist.")
+            print(chunks)
+            # # Check if the "PDF_docs" directory exists and has files
+            # if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
+            #     directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
+                
+            #     if directory_path.endswith('.pdf'):
+            #         loader = PyPDFLoader(directory_path)
+            #         chunks += loader.load_and_split()
+            #         print(chunks)
+                
+            #     else:
+            #         print("No PDF files found in the directory.")
+            # else:
+            #     print("PDF_docs directory is empty or does not exist.")
                 
             return chunks
+            
         else:
             print("No abstract text found.")
             return None
@@ -180,8 +183,12 @@ class Paper_to_Chatbot:
         """
         chunks = self.chunks()
         if chunks:
+            
             embedding_function = self.embedding()
-            db = Chroma.from_documents(chunks, embedding_function)
+        
+            #db = Chroma.from_documents(chunks, embedding_function)
+            db = Chroma.from_texts(chunks, embedding_function)
+
             return db
         else:
             print("No chunks found to initialize the database.")
