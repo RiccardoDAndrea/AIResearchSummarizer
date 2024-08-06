@@ -39,18 +39,18 @@ class Paper_to_Chatbot:
             - name_of_file: string (example 23-1612.pdf)
         """
         if self.check_and_create_folder():
-            response = requests.get(self.url)  # Fetch the webpage
+            response = requests.get(self.url)                       # Fetch the webpage
             
-            if response.status_code == 200:  # Status code 200 means the request was successful
+            if response.status_code == 200:                         # Status code 200 means the request was successful
                 soup = BeautifulSoup(response.text, 'html.parser')  # Create a BeautifulSoup object from the HTML code
-                paper_links = soup.find_all('a', href=True)  # Find all links on the webpage
+                paper_links = soup.find_all('a', href=True)         # Find all links on the webpage
                 
                 pdf_links = [link['href'] for link in paper_links if link['href'].endswith('.pdf')]  # Find all links ending with .pdf
                 
                 if pdf_links:
-                    latest_paper_link = pdf_links[0]  # get the first item of the list
-                    latest_paper_url = self.url + latest_paper_link
-                    name_of_file = latest_paper_link.split('/')[-1]
+                    latest_paper_link = pdf_links[0]                    # get the first item of the list
+                    latest_paper_url = self.url + latest_paper_link     # create the full URL
+                    name_of_file = latest_paper_link.split('/')[-1]     # return 23-1612.pdf as example
                     return latest_paper_url, name_of_file    
                       
                 else:
@@ -60,6 +60,30 @@ class Paper_to_Chatbot:
             else: 
                 print(f"Error: {response.status_code}")
                 return None, None
+    
+
+    def getAbstract(self):
+        """
+        Eine Funktion, die das Abstract der Webseite https://www.jmlr.org/ abruft von der aktuellsten Veröffentlichung Paper
+        Input:
+            - url: string
+        Output:
+            - latest_paper_link: string
+        """
+        response = requests.get(self.url)                               # Abrufen der Webseite
+        if response.status_code == 200:                                 # status code 200 bedeutet, dass die Anfrage erfolgreich war
+            text = response.text                                        # Inhalt der Webseite html code
+            soup = BeautifulSoup(text, 'html.parser')                   # Erstelle ein BeautifulSoup-Objekt form html code
+            paper_links = soup.find_all('a', href=True)                 # Finde alle Links auf der Webseite 
+            # Finde alle Links die auf .html enden für die Abstract-Seite
+            meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')] 
+            
+            ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0] # Wähle den Link der auf /papers/ endet
+            _text = WebBaseLoader(self.url + ergebnis)
+            data = _text.load()
+            abstract_text = data[0].page_content.split('Abstract\n\n\n')[1].split('\n\n\n')[0]
+            
+            return abstract_text
         
 
     def download_pdf(self, pdf_url: str, filename: str):
@@ -84,79 +108,42 @@ class Paper_to_Chatbot:
         except Exception as e:
             print(f"An error occurred: {e}")
 
+    def text_splitter():
+        """
+        Initialisiert den Text-Splitter
 
+        Input:
+            - None
+
+        Output:
+            - text_splitter: Ein Objekt des Text-Splitters
+        """
+        
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=200,
+            chunk_overlap=50, 
+            length_function=len)
+        return text_splitter
+
+    def chunks(Abstract: str):
+        chunks = Abstract.load_and_split()
 
 
 
 # Example usage:
-url = "https://www.jmlr.org/"
+url = "https://www.jmlr.org"
 paper_bot = Paper_to_Chatbot(url)
+
 pdf_url, filename = paper_bot.getPaper()
+#Abstract = paper_bot.getAbstract()
 if pdf_url and filename:
     paper_bot.download_pdf(pdf_url, filename)
 
 
 
-#     
-
-# # Example usage:
-# #download_pdf(str_latest_paper_link, '23-1612.pdf')
 
 
-# def get_Abstract(url: str):
-#     """
-#     Eine Funktion, die das Abstract der Webseite https://www.jmlr.org/ abruft von der aktuellsten Veröffentlichung Paper
-#     Input:
-#         - url: string
-#     Output:
-#         - latest_paper_link: string
-#     """
-#     response = requests.get(url)                                    # Abrufen der Webseite
-#     if response.status_code == 200:                                 # status code 200 bedeutet, dass die Anfrage erfolgreich war
-#         text = response.text                                        # Inhalt der Webseite html code
-#         soup = BeautifulSoup(text, 'html.parser')                   # Erstelle ein BeautifulSoup-Objekt form html code
-#         paper_links = soup.find_all('a', href=True)                 # Finde alle Links auf der Webseite 
-#         meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')] # Finde alle Links die auf .html enden für die Abstract-Seite
-        
-#         ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0] # Wähle den Link der auf /papers/ endet
-#         webpage_abs = url + ergebnis
-#         return webpage_abs
 
-
-# def get_Meta_Info(url: str):
-#     """
-#     Input
-#     - url: URL of the JMLR website
-#     Output
-#     - meta_data: string with the Author, Title and Abstract and so on
-#     """
-#     response = requests.get(url)  # Abrufen der Webseite
-    
-#     if response.status_code == 200:  # Bei erfolgreichem Abrufen der Webseite
-#         text = response.text  # Inhalt der Webseite HTML-Code
-#         soup = BeautifulSoup(text, 'html.parser')  # Erstelle ein BeautifulSoup-Objekt vom HTML-Code
-#         paper_links = soup.find_all('a', href=True)  # Finde alle Links auf der Webseite
-#         meta_data_ = [link['href'] for link in paper_links if link['href'].endswith('.bib')]  # Finde alle Links, die auf .bib enden für die Metadaten
-        
-#         if not meta_data_:
-#             return "No metadata link found."
-        
-#         meta_data = meta_data_[0]  # Wähle den aktuellsten Link
-#         ergebnis_meta_info = url + meta_data
-#         meta_information = requests.get(ergebnis_meta_info).text
-        
-#         title_match = re.search(r'title\s*=\s*\{(.+?)\}', meta_information, re.IGNORECASE)
-#         author_match = re.search(r'author\s*=\s*\{(.+?)\}', meta_information, re.IGNORECASE)
-        
-#         title = title_match.group(1) if title_match else "Title not found"
-#         author = author_match.group(1) if author_match else "Author not found"
-
-#         result = "Title: '" + str(title) + "'" + " " + ", Author : " + "'" + str(author) + "'"
-
-#         return result
-#     else:
-#         return f"Error: {response.status_code}"
-   
 
 # def text_splitter():
 #     """
