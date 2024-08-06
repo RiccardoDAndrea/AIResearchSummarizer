@@ -150,7 +150,7 @@ class Paper_to_Chatbot:
                 if directory_path.endswith('.pdf'):
                     text_splitter = self.text_splitter()
                     loader = PyPDFLoader(directory_path)
-                    chunks_pdf_doc += loader.load_and_split()
+                    chunks_pdf_doc = loader.load_and_split()
             
             chunks = chunks_abstract + chunks_pdf_doc
             
@@ -199,9 +199,8 @@ class Paper_to_Chatbot:
         if chunks:
             
             embedding_function = self.embedding()
-        
-            #db = Chroma.from_documents(chunks, embedding_function)
             db = Chroma.from_documents(chunks, embedding_function)
+            
 
             return db
         else:
