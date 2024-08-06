@@ -133,12 +133,25 @@ class Paper_to_Chatbot:
             - None
 
         Output:
-            - chunks: List of text chunks
+            - chunks: List of text chunks or None if no abstract text is found
         """
         abstract_text = self.getAbstract()
         if abstract_text:
             text_splitter = self.text_splitter()
             chunks = text_splitter.split_text(abstract_text)
+            
+            # Check if the "PDF_docs" directory exists and has files
+            if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
+                directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
+                if directory_path.endswith('.pdf'):
+                    loader = PyPDFLoader(directory_path)
+                    chunks += loader.load_and_split()
+                    print(chunks)
+                else:
+                    print("No PDF files found in the directory.")
+            else:
+                print("PDF_docs directory is empty or does not exist.")
+                
             return chunks
         else:
             print("No abstract text found.")
@@ -193,7 +206,6 @@ class Paper_to_Chatbot:
             print("No database initialized.")
             return None
         
-
     def llm_model(self):
         """
         Initialisiert das OpenAI-Modell. Hier wird das OpenAI modell genutzt für das RAG Modell
@@ -206,7 +218,7 @@ class Paper_to_Chatbot:
         """
         
         llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
-                              huggingfacehub_api_token= self.HUGGINGFACEAPI_TOKEN,
+                              huggingfacehub_api_token = API_Key,
                               )
         return llm
     
@@ -229,6 +241,31 @@ class Paper_to_Chatbot:
         
         return qa_with_sources.invoke(query)
 
+
+
+import json
+
+def get_keys(path):
+    with open(path) as f:
+        return json.load(f)
+keys = get_keys("secret_File.json")
+API_Key = keys['API_Key']
+
+print(API_Key)
+
+
+# Beispielverzeichnis
+
+
+# Die letzte Datei finden
+
+
+
+
+
+
+
+
 # Example usage
 if __name__ == "__main__":
     url = "https://www.jmlr.org/"
@@ -241,26 +278,4 @@ if __name__ == "__main__":
     if documents:
         for doc in documents:
             print(doc)
-
-
-
-
-
-
-
-
-
-
-# def get_all_information(url:str):
-#     """
-#     Get all information from the website
-#     """
-    
-#     paper_link = getPaper(url)
-#     abstract_link = get_Abstract(url)
-#     title, author = get_Meta_Info(url)
-#     return paper_link, abstract_link, title, author
-
-
-
 
