@@ -5,15 +5,18 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import PyPDFLoader
 import requests
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_community.vectorstores import Chroma
 import fitz # PyMuPDF
 import os
+from langchain_community.llms import HuggingFaceEndpoint
+from langchain.chains import RetrievalQAWithSourcesChain
+
 
 
 class Paper_to_Chatbot:
-    
     def __init__(self, url: str):
         self.url = url
-
 
     def check_and_create_folder(self):
         """
@@ -28,7 +31,6 @@ class Paper_to_Chatbot:
             print("Folder created")
             return False
 
-
     def getPaper(self):
         """
         A function that retrieves the latest paper from the website https://www.jmlr.org/ of the most recent publication.
@@ -39,52 +41,51 @@ class Paper_to_Chatbot:
             - name_of_file: string (example 23-1612.pdf)
         """
         if self.check_and_create_folder():
-            response = requests.get(self.url)                       # Fetch the webpage
-            
-            if response.status_code == 200:                         # Status code 200 means the request was successful
+            response = requests.get(self.url)  # Fetch the webpage
+
+            if response.status_code == 200:  # Status code 200 means the request was successful
                 soup = BeautifulSoup(response.text, 'html.parser')  # Create a BeautifulSoup object from the HTML code
-                paper_links = soup.find_all('a', href=True)         # Find all links on the webpage
-                
+                paper_links = soup.find_all('a', href=True)  # Find all links on the webpage
+
                 pdf_links = [link['href'] for link in paper_links if link['href'].endswith('.pdf')]  # Find all links ending with .pdf
-                
+
                 if pdf_links:
-                    latest_paper_link = pdf_links[0]                    # get the first item of the list
-                    latest_paper_url = self.url + latest_paper_link     # create the full URL
-                    name_of_file = latest_paper_link.split('/')[-1]     # return 23-1612.pdf as example
-                    return latest_paper_url, name_of_file    
-                      
+                    latest_paper_link = pdf_links[0]  # get the first item of the list
+                    latest_paper_url = self.url + latest_paper_link  # create the full URL
+                    name_of_file = latest_paper_link.split('/')[-1]  # return 23-1612.pdf as example
+                    return latest_paper_url, name_of_file
+
                 else:
                     print("No PDF links found.")
                     return None, None
-                
-            else: 
+
+            else:
                 print(f"Error: {response.status_code}")
                 return None, None
-    
 
     def getAbstract(self):
         """
-        Eine Funktion, die das Abstract der Webseite https://www.jmlr.org/ abruft von der aktuellsten Veröffentlichung Paper
+        A function that retrieves the abstract from the website https://www.jmlr.org/ of the most recent publication.
         Input:
             - url: string
         Output:
-            - latest_paper_link: string
+            - abstract_text: string
         """
-        response = requests.get(self.url)                               # Abrufen der Webseite
-        if response.status_code == 200:                                 # status code 200 bedeutet, dass die Anfrage erfolgreich war
-            text = response.text                                        # Inhalt der Webseite html code
-            soup = BeautifulSoup(text, 'html.parser')                   # Erstelle ein BeautifulSoup-Objekt form html code
-            paper_links = soup.find_all('a', href=True)                 # Finde alle Links auf der Webseite 
-            # Finde alle Links die auf .html enden für die Abstract-Seite
-            meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')] 
-            
-            ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0] # Wähle den Link der auf /papers/ endet
+        response = requests.get(self.url)  # Fetch the webpage
+        if response.status_code == 200:  # status code 200 means the request was successful
+            text = response.text  # Content of the webpage html code
+            soup = BeautifulSoup(text, 'html.parser')  # Create a BeautifulSoup object from the HTML code
+            paper_links = soup.find_all('a', href=True)  # Find all links on the webpage
+
+            # Find all links ending with .html for the abstract page
+            meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')]
+
+            ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0]  # Select the link ending with /papers/
             _text = WebBaseLoader(self.url + ergebnis)
             data = _text.load()
             abstract_text = data[0].page_content.split('Abstract\n\n\n')[1].split('\n\n\n')[0]
-            
+
             return abstract_text
-        
 
     def download_pdf(self, pdf_url: str, filename: str):
         """
@@ -108,78 +109,146 @@ class Paper_to_Chatbot:
         except Exception as e:
             print(f"An error occurred: {e}")
 
-    def text_splitter():
+    def text_splitter(self):
         """
-        Initialisiert den Text-Splitter
+        Initializes the text splitter.
 
         Input:
             - None
 
         Output:
-            - text_splitter: Ein Objekt des Text-Splitters
+            - text_splitter: An object of the text splitter
         """
-        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=200,
-            chunk_overlap=50, 
+            chunk_overlap=50,
             length_function=len)
         return text_splitter
 
-    def chunks(Abstract: str):
-        chunks = Abstract.load_and_split()
+    def chunks(self):
+        """
+        Splits the abstract text into chunks.
 
+        Input:
+            - None
 
+        Output:
+            - chunks: List of text chunks
+        """
+        abstract_text = self.getAbstract()
+        if abstract_text:
+            text_splitter = self.text_splitter()
+            chunks = text_splitter.split_text(abstract_text)
+            return chunks
+        else:
+            print("No abstract text found.")
+            return None
 
-# Example usage:
-url = "https://www.jmlr.org"
-paper_bot = Paper_to_Chatbot(url)
+    def embedding(self):
+        """
+        Returns a model with sentence embeddings.
+        Input: 
+            - None
 
-pdf_url, filename = paper_bot.getPaper()
-#Abstract = paper_bot.getAbstract()
-if pdf_url and filename:
-    paper_bot.download_pdf(pdf_url, filename)
+        Output: 
+            - embedding_function
+        """
+        embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+        return embedding_function
 
+    def initialise_chroma(self):
+        """
+        Initializes the Chroma database.
+        Input:
+            - None
 
+        Output:
+            - db: The Chroma database
+        """
+        chunks = self.chunks()
+        if chunks:
+            embedding_function = self.embedding()
+            db = Chroma.from_documents(chunks, embedding_function)
+            return db
+        else:
+            print("No chunks found to initialize the database.")
+            return None
 
-
-
-
-
-# def text_splitter():
-#     """
-#     Initialisiert den Text-Splitter
-
-#     Input:
-#         - None
-
-#     Output:
-#         - text_splitter: Ein Objekt des Text-Splitters
-#     """
-    
-#     text_splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=200,
-#         chunk_overlap=50, 
-#         length_function=len,
+    def retriever(self, query: str):
+        """
+        Initializes the retriever for the external data sources and returns the relevant documents.
         
-#     )
+        Input:
+            - query: The query string
+        
+        Output:
+            - retriever: The relevant documents
+        """
+        db = self.initialise_chroma()
+        if db:
+            retriever = db.as_retriever(search_kwargs={"k": 2})
+            documents = retriever.get_relevant_documents(query)
+            return documents
+        else:
+            print("No database initialized.")
+            return None
+        
 
-#     return text_splitter
-
-
-# def PyPDFLoader_papers(pdf = str):
-#     """
-#     Initialisiert den WebBaseLoader
-
-#     Input:
-#         - None
-
-#     Output:
-#         - loader: Ein Objekt des WebBaseLoader
-#     """
+    def llm_model(self):
+        """
+        Initialisiert das OpenAI-Modell. Hier wird das OpenAI modell genutzt für das RAG Modell
+        
+        Input:
+            - None
+        
+        Output:
+            - das LLM Modell von OpenAI
+        """
+        
+        llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
+                              huggingfacehub_api_token= self.HUGGINGFACEAPI_TOKEN,
+                              )
+        return llm
     
-#     loader = PyPDFLoader(pdf)
-#     pages = loader.load_and_split()
-#     return pages
+    def qa_with_sources(self, query):
+        """
+        Die Funktion die die Frage beantwortet und die Quellen zurückgibt
+        Input:
+            - query: Die die Frage beinhalet
+        Output:
+            - qa_with_sources: Die Antwort auf die Frage und die Quellen
+        
+        """
+
+        llm = self.llm_model()
+        text_splitter_instance = self.text_splitter()
+        chunks = self.loader_for_chunks(text_splitter_instance)
+        embedding_instance = self.embedding()
+        retriever_instance = self.retriever(Chroma.from_documents(chunks, embedding_instance), query)
+        qa_with_sources = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_instance)
+        
+        return qa_with_sources.invoke(query)
+
+# Example usage
+if __name__ == "__main__":
+    url = "https://www.jmlr.org/"
+    query = "What is the latest paper about?"
+    paper_to_chatbot = Paper_to_Chatbot(url)
+    latest_paper_url, filename = paper_to_chatbot.getPaper()
+    if latest_paper_url and filename:
+        paper_to_chatbot.download_pdf(latest_paper_url, filename)
+    documents = paper_to_chatbot.retriever(query)
+    if documents:
+        for doc in documents:
+            print(doc)
+
+
+
+
+
+
+
+
 
 
 # def get_all_information(url:str):
@@ -193,35 +262,5 @@ if pdf_url and filename:
 #     return paper_link, abstract_link, title, author
 
 
-# def extract_text_from_pdf(filename: str):
-#     """
-#     Extracts text from a PDF file using PyMuPDF.
-    
-#     Input:
-#     - filename: The local filename of the PDF
-    
-#     Output:
-#     - text: Extracted text from the PDF
-#     """
-#     try:
-#         document = fitz.open(filename)
-#         text = ""
-#         for page_num in range(document.page_count):
-#             page = document.load_page(page_num)
-#             text += page.get_text()
-#         return text
-#     except Exception as e:
-#         return f"An error occurred: {e}"
 
 
-# #extracted_text = extract_text_from_pdf(file_name)
-
-        
-# # Test the functions
-# #str_latest_paper_link, latest_paper = getPaper('https://www.jmlr.org')
-
-# #print(get_Meta_Info('https://www.jmlr.org'))
-# #print(get_Abstract('https://www.jmlr.org'))
-# #print(extract_title_and_author(get_Meta_Info('https://www.jmlr.org')))
-
-# #print(get_all_information('https://www.jmlr.org'))
