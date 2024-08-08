@@ -63,29 +63,7 @@ class Paper_to_Chatbot:
                 print(f"Error: {response.status_code}")
                 return None, None
 
-    def getAbstract(self):
-        """
-        A function that retrieves the abstract from the website https://www.jmlr.org/ of the most recent publication.
-        Input:
-            - url: string
-        Output:
-            - abstract_text: string
-        """
-        response = requests.get(self.url)  # Fetch the webpage
-        if response.status_code == 200:  # status code 200 means the request was successful
-            text = response.text  # Content of the webpage html code
-            soup = BeautifulSoup(text, 'html.parser')  # Create a BeautifulSoup object from the HTML code
-            paper_links = soup.find_all('a', href=True)  # Find all links on the webpage
-
-            # Find all links ending with .html for the abstract page
-            meta_data_ = [paper_link['href'] for paper_link in paper_links if paper_link['href'].endswith('.html')]
-
-            ergebnis = [paper_link for paper_link in meta_data_ if '/papers/' in paper_link][0]  # Select the link ending with /papers/
-            _text = WebBaseLoader(self.url + ergebnis)
-            data = _text.load()
-            abstract_text = data[0].page_content.split('Abstract\n\n\n')[1].split('\n\n\n')[0]
-
-            return abstract_text
+    
 
     def download_pdf(self, pdf_url: str, filename: str):
         """
@@ -137,42 +115,17 @@ class Paper_to_Chatbot:
         Output:
             - chunks: List of text chunks or None if no abstract text is found
         """
-        abstract_text = self.getAbstract()
-        if abstract_text:
-            text_splitter = self.text_splitter()
-            chunks_abstract = text_splitter.split_text(abstract_text)
-            
-
-            chunks_pdf_doc = []
+        chunks = []
             # Check if the "PDF_docs" directory exists and has files
-            if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
-                directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
-                if directory_path.endswith('.pdf'):
-                    text_splitter = self.text_splitter()
-                    loader = PyPDFLoader(directory_path)
-                    chunks_pdf_doc = loader.load_and_split()
-            
-            chunks = chunks_abstract + chunks_pdf_doc
-            
-            # # Check if the "PDF_docs" directory exists and has files
-            # if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
-            #     directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
+        if os.path.exists("PDF_docs") and os.listdir("PDF_docs"):
+            directory_path = os.path.join("PDF_docs", os.listdir("PDF_docs")[0])
+            if directory_path.endswith('.pdf'):
+                loader = PyPDFLoader(directory_path)
+        chunks += loader.load_and_split()
+        print(chunks)
+        
                 
-            #     if directory_path.endswith('.pdf'):
-            #         loader = PyPDFLoader(directory_path)
-            #         chunks += loader.load_and_split()
-            #         print(chunks)
-                
-            #     else:
-            #         print("No PDF files found in the directory.")
-            # else:
-            #     print("PDF_docs directory is empty or does not exist.")
-                
-            return chunks
-            
-        else:
-            print("No abstract text found.")
-            return None
+        return chunks
 
     def embedding(self):
         """
@@ -240,8 +193,8 @@ class Paper_to_Chatbot:
         llm = HuggingFaceEndpoint(repo_id='mistralai/Mistral-7B-Instruct-v0.2', 
                               huggingfacehub_api_token = API_Key)
         return llm
-    
-    
+
+
         
 
 
@@ -256,28 +209,26 @@ API_Key = keys['API_Key']
 print(API_Key)
 
 
-# Beispielverzeichnis
 
+chatbot = Paper_to_Chatbot(url="https://www.jmlr.org/")
 
-# Die letzte Datei finden
+# Schritt 1: Papier abrufen und herunterladen
+pdf_url, filename = chatbot.getPaper()
+if pdf_url and filename:
+    chatbot.download_pdf(pdf_url, filename)
 
+# Schritt 2: Text in Chunks aufteilen
+chunks = chatbot.chunks()
 
+# Schritt 3: Chroma-Datenbank initialisieren
+db = chatbot.initialise_chroma()
 
+# Schritt 4: Abfrage stellen
+query = "What is the main contribution of the paper?"
+documents = chatbot.retriever(query)
 
-print(Paper_to_Chatbot.chunks(Paper_to_Chatbot("https://www.jmlr.org/")))
+# Schritt 5: Antwort generieren
+answer = chatbot.llm_model().invoke(query)
+print(answer)
 
-
-
-# Example usage
-if __name__ == "__main__":
-    url = "https://www.jmlr.org/"
-    query = "What is the latest paper about?"
-    paper_to_chatbot = Paper_to_Chatbot(url)
-    latest_paper_url, filename = paper_to_chatbot.getPaper()
-    if latest_paper_url and filename:
-        paper_to_chatbot.download_pdf(latest_paper_url, filename)
-    documents = paper_to_chatbot.retriever(query)
-    if documents:
-        for doc in documents:
-            print(doc)
 
