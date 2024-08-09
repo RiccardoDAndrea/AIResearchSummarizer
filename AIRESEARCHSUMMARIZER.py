@@ -10,6 +10,7 @@ from langchain_community.vectorstores import Chroma
 import os
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.prompts import PromptTemplate
 
 
 
@@ -98,8 +99,8 @@ class Paper_to_Chatbot:
         """
         text_splitter = RecursiveCharacterTextSplitter(
             separators="\n",
-            chunk_size=200,
-            chunk_overlap=50,
+            chunk_size=500,
+            chunk_overlap=100,
             length_function=len)
         
         return text_splitter
@@ -121,7 +122,7 @@ class Paper_to_Chatbot:
             if directory_path.endswith('.pdf'):
                 loader = PyPDFLoader(directory_path)
         chunks += loader.load_and_split()
-        print(chunks)
+        #print(chunks)
         
                 
         return chunks
@@ -218,12 +219,12 @@ if pdf_url and filename:
 
 # Schritt 2: Text in Chunks aufteilen
 chunks = chatbot.chunks()
-
+print(chunks)
 # Schritt 3: Chroma-Datenbank initialisieren
 db = chatbot.initialise_chroma()
 
 # Schritt 4: Abfrage stellen
-#query = "What is the main contribution of the paper?"
+
 query = "What does the paper 'BenchMARL: Benchmarking Multi-Agent Reinforcement?' talk about?"
 documents = chatbot.retriever(query)
 
