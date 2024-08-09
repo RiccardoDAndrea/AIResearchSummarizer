@@ -87,6 +87,8 @@ class Paper_to_Chatbot:
         except Exception as e:
             print(f"An error occurred: {e}")
 
+    
+
     def text_splitter(self):
         """
         Initializes the text splitter.
