@@ -7,7 +7,6 @@ from langchain_community.document_loaders import PyPDFLoader
 import requests
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import Chroma
-import fitz # PyMuPDF
 import os
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain.chains import RetrievalQAWithSourcesChain
@@ -224,7 +223,8 @@ chunks = chatbot.chunks()
 db = chatbot.initialise_chroma()
 
 # Schritt 4: Abfrage stellen
-query = "What is the main contribution of the paper?"
+#query = "What is the main contribution of the paper?"
+query = "What does the paper 'BenchMARL: Benchmarking Multi-Agent Reinforcement?' talk about?"
 documents = chatbot.retriever(query)
 
 # Schritt 5: Antwort generieren
